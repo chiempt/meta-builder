@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { useForm, FieldValues, DefaultValues } from "react-hook-form";
+import { Form, Card, Row, Col, Button, Space } from "antd";
+import type { Rule } from "antd/es/form";
 import { EntityMetadata, FieldMetadata } from "../../types/metadata";
 import { TextField } from "./fields/TextField";
 import { EnumField } from "./fields/EnumField";
@@ -10,18 +11,12 @@ import { RelationField } from "./fields/RelationField";
 
 interface DynamicFormProps {
   entity: EntityMetadata;
-  onSubmit: (data: FieldValues) => void;
-  defaultValues?: DefaultValues<FieldValues>;
+  onSubmit: (data: Record<string, unknown>) => void;
+  defaultValues?: Record<string, unknown>;
 }
 
 export function DynamicForm({ entity, onSubmit, defaultValues }: DynamicFormProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    defaultValues,
-  });
+  const [form] = Form.useForm();
 
   // Group fields by section
   const sections = useMemo(() => {
@@ -36,76 +31,121 @@ export function DynamicForm({ entity, onSubmit, defaultValues }: DynamicFormProp
     return grouped;
   }, [entity]);
 
-  // Helper to get Tailwind grid span class
+  // Map metadata width to antd Col span (24-column grid)
   const getColSpan = (width?: string) => {
     switch (width) {
       case "full":
-        return "col-span-12";
+        return 24;
       case "half":
-        return "col-span-12 sm:col-span-6";
+        return 12;
       case "quarter":
-        return "col-span-12 sm:col-span-6 md:col-span-3";
+        return 6;
       default:
-        return "col-span-12"; // Default to full width
+        return 24;
     }
+  };
+
+  // Build antd Form.Item rules from field metadata
+  const buildRules = (field: FieldMetadata): Rule[] => {
+    const rules: Rule[] = [];
+
+    if (field.isRequired) {
+      rules.push({ required: true, message: `${field.displayName} là bắt buộc` });
+    }
+
+    if (field.validationConfig?.minLength) {
+      rules.push({
+        min: field.validationConfig.minLength,
+        message: `Tối thiểu ${field.validationConfig.minLength} ký tự`,
+      });
+    }
+
+    if (field.validationConfig?.maxLength) {
+      rules.push({
+        max: field.validationConfig.maxLength,
+        message: `Tối đa ${field.validationConfig.maxLength} ký tự`,
+      });
+    }
+
+    if (field.validationConfig?.pattern) {
+      rules.push({
+        pattern: new RegExp(field.validationConfig.pattern),
+        message: "Định dạng không hợp lệ",
+      });
+    }
+
+    if (field.validationConfig?.format === "email") {
+      rules.push({ type: "email", message: "Email không hợp lệ" });
+    }
+
+    return rules;
   };
 
   const renderField = (field: FieldMetadata) => {
-    const props = { field, register, error: errors[field.name] };
-
     switch (field.fieldType) {
       case "TEXT":
       case "EMAIL":
-        return <TextField key={field.name} {...props} />;
+        return <TextField field={field} />;
       case "ENUM":
-        return <EnumField key={field.name} {...props} />;
+        return <EnumField field={field} />;
       case "CURRENCY":
-        return <CurrencyField key={field.name} {...props} />;
+        return <CurrencyField field={field} />;
       case "RELATION":
-        return <RelationField key={field.name} {...props} />;
+        return <RelationField field={field} />;
       default:
-        // Fallback for unhandled types
-        return <TextField key={field.name} {...props} />;
+        return <TextField field={field} />;
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      {Object.entries(sections).map(([sectionKey, fields]) => (
-        <div
-          key={sectionKey}
-          className="rounded-xl border border-gray-100 bg-white/70 p-6 shadow-sm backdrop-blur-md"
-        >
-          <h3 className="mb-4 text-lg font-semibold text-gray-800 capitalize">
-            {sectionKey} Information
-          </h3>
-          <div className="grid grid-cols-12 gap-6">
-            {fields.map((field) => (
-              <div
-                key={field.name}
-                className={getColSpan(field.uiConfig?.width)}
-              >
-                {renderField(field)}
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
+  const handleFinish = (values: Record<string, unknown>) => {
+    onSubmit(values);
+  };
 
-      <div className="flex justify-end gap-3 pt-4">
-        <button
-          type="button"
-          className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          Save {entity.displayName}
-        </button>
-      </div>
-    </form>
+  return (
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={handleFinish}
+      initialValues={defaultValues}
+      scrollToFirstError
+    >
+      <Space direction="vertical" size="large" style={{ width: "100%" }}>
+        {Object.entries(sections).map(([sectionKey, fields]) => (
+          <Card
+            key={sectionKey}
+            title={`${sectionKey.charAt(0).toUpperCase() + sectionKey.slice(1)} Information`}
+            variant="borderless"
+            styles={{
+              header: { borderBottom: "1px solid #f0f0f0" },
+            }}
+          >
+            <Row gutter={[16, 0]}>
+              {fields.map((field) => (
+                <Col key={field.name} span={getColSpan(field.uiConfig?.width)}>
+                  <Form.Item
+                    name={field.name}
+                    label={field.displayName}
+                    rules={buildRules(field)}
+                  >
+                    {renderField(field)}
+                  </Form.Item>
+                </Col>
+              ))}
+            </Row>
+          </Card>
+        ))}
+
+        <Row justify="end">
+          <Space>
+            <Button onClick={() => form.resetFields()}>
+              Hủy
+            </Button>
+            <Button type="primary" htmlType="submit">
+              Lưu {entity.displayName}
+            </Button>
+          </Space>
+        </Row>
+      </Space>
+    </Form>
   );
 }

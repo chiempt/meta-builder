@@ -1,8 +1,11 @@
 "use client";
 
+import { Typography, Space, Flex } from "antd";
+import { AppstoreOutlined } from "@ant-design/icons";
 import { EntityMetadata } from "../types/metadata";
 import { DynamicForm } from "../components/dynamic/DynamicForm";
-import { LayoutTemplate } from "lucide-react";
+
+const { Title, Text } = Typography;
 
 const customerEntity: EntityMetadata = {
   id: "uuid-entity-001",
@@ -113,24 +116,32 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50 p-8">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-8 flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 shadow-lg shadow-blue-600/20">
-            <LayoutTemplate className="h-6 w-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              Dynamic Metadata Builder
-            </h1>
-            <p className="text-sm text-gray-500">
-              Rendering `{customerEntity.name}` entity from JSON schema.
-            </p>
-          </div>
-        </div>
+    <div style={{ maxWidth: 800, margin: "0 auto" }}>
+      <Flex align="center" gap={12} style={{ marginBottom: 32 }}>
+        <Flex
+          align="center"
+          justify="center"
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: 12,
+            background: "#1677ff",
+            boxShadow: "0 4px 14px rgba(22, 119, 255, 0.25)",
+          }}
+        >
+          <AppstoreOutlined style={{ fontSize: 24, color: "#fff" }} />
+        </Flex>
+        <Space direction="vertical" size={0}>
+          <Title level={3} style={{ margin: 0 }}>
+            Dynamic Metadata Builder
+          </Title>
+          <Text type="secondary">
+            Rendering `{customerEntity.name}` entity from JSON schema.
+          </Text>
+        </Space>
+      </Flex>
 
-        <DynamicForm entity={customerEntity} onSubmit={handleSubmit} />
-      </div>
-    </main>
+      <DynamicForm entity={customerEntity} onSubmit={handleSubmit} />
+    </div>
   );
 }
