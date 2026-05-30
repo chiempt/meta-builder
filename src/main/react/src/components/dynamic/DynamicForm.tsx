@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { Form, Card, Row, Col, Button, Space } from "antd";
+import { Form, Card, Row, Col, Button, Space, Flex, Typography } from "antd";
 import type { Rule } from "antd/es/form";
 import { EntityMetadata, FieldMetadata } from "../../types/metadata";
 import { TextField } from "./fields/TextField";
 import { EnumField } from "./fields/EnumField";
 import { CurrencyField } from "./fields/CurrencyField";
 import { RelationField } from "./fields/RelationField";
+
+const { Title } = Typography;
 
 interface DynamicFormProps {
   entity: EntityMetadata;
@@ -108,23 +110,39 @@ export function DynamicForm({ entity, onSubmit, defaultValues }: DynamicFormProp
       onFinish={handleFinish}
       initialValues={defaultValues}
       scrollToFirstError
+      requiredMark="optional"
     >
-      <Space direction="vertical" size="large" style={{ width: "100%" }}>
+      <Flex vertical gap={24} style={{ width: "100%" }}>
         {Object.entries(sections).map(([sectionKey, fields]) => (
           <Card
             key={sectionKey}
-            title={`${sectionKey.charAt(0).toUpperCase() + sectionKey.slice(1)} Information`}
-            variant="borderless"
+            bordered={false}
+            title={
+              <Title level={5} style={{ margin: 0, color: "#0f172a", fontWeight: 700 }}>
+                {`${sectionKey.charAt(0).toUpperCase() + sectionKey.slice(1)} Information`}
+              </Title>
+            }
             styles={{
-              header: { borderBottom: "1px solid #f0f0f0" },
+              header: {
+                borderBottom: "1px dashed #e2e8f0",
+                padding: "20px 32px"
+              },
+              body: {
+                padding: "32px"
+              }
+            }}
+            style={{
+              boxShadow: "0 10px 40px -10px rgba(0,0,0,0.08)",
+              borderRadius: 24,
+              overflow: "hidden"
             }}
           >
-            <Row gutter={[16, 0]}>
+            <Row gutter={[24, 8]}>
               {fields.map((field) => (
                 <Col key={field.name} span={getColSpan(field.uiConfig?.width)}>
                   <Form.Item
                     name={field.name}
-                    label={field.displayName}
+                    label={<span style={{ fontWeight: 500, color: "#475569" }}>{field.displayName}</span>}
                     rules={buildRules(field)}
                   >
                     {renderField(field)}
@@ -136,16 +154,16 @@ export function DynamicForm({ entity, onSubmit, defaultValues }: DynamicFormProp
         ))}
 
         <Row justify="end">
-          <Space>
-            <Button onClick={() => form.resetFields()}>
-              Hủy
+          <Space size="middle">
+            <Button size="large" onClick={() => form.resetFields()}>
+              Cancel
             </Button>
-            <Button type="primary" htmlType="submit">
-              Lưu {entity.displayName}
+            <Button size="large" type="primary" htmlType="submit">
+              Save {entity.displayName}
             </Button>
           </Space>
         </Row>
-      </Space>
+      </Flex>
     </Form>
   );
 }

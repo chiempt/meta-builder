@@ -35,3 +35,5 @@ build/
 ### Custom Ignores ###
 src/main/react/node/
 .env
+node_modules/
+.next/

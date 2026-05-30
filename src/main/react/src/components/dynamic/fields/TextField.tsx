@@ -5,19 +5,19 @@ import { FieldMetadata } from "../../../types/metadata";
 interface TextFieldProps {
   field: FieldMetadata;
   value?: string;
-  onChange?: (value: string) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
 export function TextField({ field, value, onChange }: TextFieldProps) {
-  const { displayName, uiConfig, fieldType } = field;
+  const { uiConfig, validationConfig, fieldType } = field;
 
   return (
     <Input
-      placeholder={uiConfig?.placeholder || `Nhập ${displayName}`}
-      type={fieldType === "EMAIL" ? "email" : "text"}
+      placeholder={uiConfig?.placeholder || `Enter ${field.displayName}`}
       value={value}
-      onChange={(e) => onChange?.(e.target.value)}
-      allowClear
+      onChange={onChange}
+      maxLength={validationConfig?.maxLength}
+      type={fieldType === "EMAIL" ? "email" : "text"}
     />
   );
 }

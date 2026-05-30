@@ -1,33 +1,27 @@
 import React from "react";
-import { Select, Tag } from "antd";
+import { Select } from "antd";
 import { FieldMetadata } from "../../../types/metadata";
 
 interface EnumFieldProps {
   field: FieldMetadata;
-  value?: string;
-  onChange?: (value: string) => void;
+  value?: string | string[];
+  onChange?: (value: string | string[]) => void;
 }
 
 export function EnumField({ field, value, onChange }: EnumFieldProps) {
-  const { displayName, enumConfig } = field;
+  const { uiConfig, enumConfig } = field;
   const options = enumConfig?.options || [];
 
   return (
     <Select
-      placeholder={`Chọn ${displayName}`}
+      placeholder={uiConfig?.placeholder || `Select ${field.displayName}`}
       value={value}
       onChange={onChange}
-      allowClear
       options={options.map((opt) => ({
+        label: opt.label,
         value: opt.value,
-        label: opt.color ? (
-          <Tag color={opt.color} bordered={false}>
-            {opt.label}
-          </Tag>
-        ) : (
-          opt.label
-        ),
       }))}
+      allowClear
     />
   );
 }
