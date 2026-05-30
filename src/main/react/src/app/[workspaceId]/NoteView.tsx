@@ -71,12 +71,12 @@ export function NoteView() {
             New
           </Button>
         </Flex>
-        
+
         <div style={{ flex: 1, overflowY: "auto" }}>
           <List
             dataSource={notes}
             renderItem={note => (
-              <div 
+              <div
                 onClick={() => selectNote(note)}
                 style={{
                   padding: "12px 16px",
@@ -108,7 +108,7 @@ export function NoteView() {
         {activeNote ? (
           <>
             <Flex align="center" justify="space-between">
-              <Input 
+              <Input
                 variant="borderless"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
@@ -119,17 +119,17 @@ export function NoteView() {
                 Save
               </Button>
             </Flex>
-            
+
             <Divider style={{ margin: "12px 0", borderColor: "#333" }} />
-            
-            <TextArea 
+
+            <TextArea
               variant="borderless"
               value={content}
               onChange={e => setContent(e.target.value)}
               placeholder="Start typing your notes here... (Markdown supported)"
-              style={{ 
-                fontSize: 16, 
-                padding: 0, 
+              style={{
+                fontSize: 16,
+                padding: 0,
                 resize: "none",
                 flex: 1,
                 color: "#d4d4d4",
