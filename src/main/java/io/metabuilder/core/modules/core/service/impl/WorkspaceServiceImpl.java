@@ -5,7 +5,10 @@ import io.metabuilder.core.modules.core.model.dto.request.WorkspaceDTO;
 import io.metabuilder.core.modules.core.model.dto.request.WorkspaceListDTO;
 import io.metabuilder.core.modules.core.repository.WorkspaceRepository;
 import io.metabuilder.core.modules.core.service.WorkspaceService;
+import io.metabuilder.core.modules.users.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,10 +17,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WorkspaceServiceImpl implements WorkspaceService {
 
+
+
     private final WorkspaceRepository workspaceRepository;
+    private final JwtUtil jwtUtil;
 
     @Override
     public Long create(WorkspaceDTO request) {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        authentication.getDetails();
+
+
         Workspace workspace = Workspace.builder()
                 .name(request.getTitle())
                 .description(request.getDescription())

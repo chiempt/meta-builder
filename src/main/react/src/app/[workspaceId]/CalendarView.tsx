@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Calendar, Badge, Modal, Form, Input, Select, message } from "antd";
+import { Calendar, Badge, Modal, Form, Input, Select, message, theme } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import { calendarApi, CalendarEvent } from "../../lib/api/calendarApi";
@@ -9,6 +9,7 @@ export function CalendarView() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [form] = Form.useForm();
+  const { token: { colorBgContainer, colorBorderSecondary, colorTextSecondary, colorText } } = theme.useToken();
 
   useEffect(() => {
     loadEvents();
@@ -56,7 +57,7 @@ export function CalendarView() {
       <ul style={{ margin: 0, padding: 0, listStyle: "none", height: "100%", width: "100%" }} onClick={() => handleSelect(value)}>
         {listData.map((item) => (
           <li key={item.id} style={{ marginBottom: 2 }}>
-            <Badge status={item.type as any} text={<span style={{ fontSize: 11, color: "#d4d4d4" }}>{item.title}</span>} />
+            <Badge status={item.type as any} text={<span style={{ fontSize: 11, color: colorText }}>{item.title}</span>} />
           </li>
         ))}
         {listData.length === 0 && <div style={{ height: 20 }} />} {/* Clickable empty space */}
@@ -71,8 +72,8 @@ export function CalendarView() {
 
   return (
     <div style={{ padding: 24, maxWidth: 1200, margin: "0 auto" }}>
-      <div style={{ padding: 24, background: "#1f1f1f", borderRadius: 8, border: "1px solid #333" }}>
-        <div style={{ marginBottom: 16, color: "#888", fontSize: 14 }}>
+      <div style={{ padding: 24, background: colorBgContainer, borderRadius: 8, border: `1px solid ${colorBorderSecondary}` }}>
+        <div style={{ marginBottom: 16, color: colorTextSecondary, fontSize: 14 }}>
           <i>Tip: Double click or tap on any date cell to add a new event.</i>
         </div>
         <Calendar 

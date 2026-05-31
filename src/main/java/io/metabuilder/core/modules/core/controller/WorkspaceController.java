@@ -1,13 +1,12 @@
 package io.metabuilder.core.modules.core.controller;
 
 import io.metabuilder.core.modules.core.model.dto.request.WorkspaceDTO;
+import io.metabuilder.core.modules.core.model.dto.request.WorkspaceListDTO;
 import io.metabuilder.core.modules.core.service.WorkspaceService;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -24,5 +23,22 @@ public class WorkspaceController {
     ) {
         return workspaceService.create(workspaceDTO);
     }
+
+
+    @GetMapping
+    List<WorkspaceListDTO> fetchList() {
+        return workspaceService.fetchList();
+    }
+
+    @PutMapping("{id}")
+    Long update(@PathVariable Long id, @RequestBody WorkspaceDTO request) {
+        return workspaceService.update(request, id);
+    }
+
+    @DeleteMapping("{id}")
+    Long delete(@PathVariable Long id, @RequestBody WorkspaceDTO request) {
+        return workspaceService.delete(id);
+    }
+
 
 }

@@ -1,6 +1,10 @@
 import React from "react";
 import { MainLayout } from "../../components/layout/MainLayout";
 
+export function generateStaticParams() {
+  return [{ workspaceId: "1" }];
+}
+
 export default async function WorkspaceLayout({
   children,
   params,
@@ -9,7 +13,7 @@ export default async function WorkspaceLayout({
   params: Promise<{ workspaceId: string }>;
 }) {
   const resolvedParams = await params;
-  
+
   return (
     <MainLayout workspaceId={resolvedParams.workspaceId}>
       {children}

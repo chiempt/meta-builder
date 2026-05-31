@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Input, Divider, Flex, Button, List, message } from "antd";
+import { Input, Divider, Flex, Button, List, message, theme } from "antd";
 import { PlusOutlined, SaveOutlined, FileTextOutlined } from "@ant-design/icons";
 import { noteApi, Note } from "../../lib/api/noteApi";
 
@@ -11,6 +11,7 @@ export function NoteView() {
   const [title, setTitle] = useState("Untitled Note");
   const [content, setContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const { token: { colorBgContainer, colorBgLayout, colorBorderSecondary, colorBgTextHover, colorTextSecondary, colorText } } = theme.useToken();
 
   useEffect(() => {
     loadNotes();
@@ -62,10 +63,10 @@ export function NoteView() {
   };
 
   return (
-    <Flex style={{ height: "100%", background: "#141414" }}>
+    <Flex style={{ height: "100%", background: colorBgContainer }}>
       {/* Sidebar - Note List */}
-      <div style={{ width: 280, borderRight: "1px solid #333", background: "#1f1f1f", display: "flex", flexDirection: "column" }}>
-        <Flex align="center" justify="space-between" style={{ padding: "16px", borderBottom: "1px solid #333" }}>
+      <div style={{ width: 280, borderRight: `1px solid ${colorBorderSecondary}`, background: colorBgLayout, display: "flex", flexDirection: "column" }}>
+        <Flex align="center" justify="space-between" style={{ padding: "16px", borderBottom: `1px solid ${colorBorderSecondary}` }}>
           <span style={{ fontWeight: 600, fontSize: 16 }}>Docs</span>
           <Button type="primary" icon={<PlusOutlined />} size="small" onClick={handleCreateNew}>
             New
@@ -81,8 +82,8 @@ export function NoteView() {
                 style={{
                   padding: "12px 16px",
                   cursor: "pointer",
-                  background: activeNote?.id === note.id ? "#2c2c2c" : "transparent",
-                  borderBottom: "1px solid #333",
+                  background: activeNote?.id === note.id ? colorBgTextHover : "transparent",
+                  borderBottom: `1px solid ${colorBorderSecondary}`,
                   display: "flex",
                   alignItems: "center",
                   gap: 12
@@ -93,7 +94,7 @@ export function NoteView() {
                   <div style={{ fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {note.title || "Untitled Note"}
                   </div>
-                  <div style={{ fontSize: 11, color: "#666" }}>
+                  <div style={{ fontSize: 11, color: colorTextSecondary }}>
                     {new Date(note.updatedAt).toLocaleDateString()}
                   </div>
                 </div>
@@ -120,7 +121,7 @@ export function NoteView() {
               </Button>
             </Flex>
 
-            <Divider style={{ margin: "12px 0", borderColor: "#333" }} />
+            <Divider style={{ margin: "12px 0", borderColor: colorBorderSecondary }} />
 
             <TextArea
               variant="borderless"
@@ -132,13 +133,13 @@ export function NoteView() {
                 padding: 0,
                 resize: "none",
                 flex: 1,
-                color: "#d4d4d4",
+                color: colorText,
                 lineHeight: 1.6
               }}
             />
           </>
         ) : (
-          <Flex align="center" justify="center" style={{ height: "100%", color: "#666" }}>
+          <Flex align="center" justify="center" style={{ height: "100%", color: colorTextSecondary }}>
             Select a note or create a new one
           </Flex>
         )}

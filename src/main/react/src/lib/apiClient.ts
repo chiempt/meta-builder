@@ -12,24 +12,38 @@ export async function apiFetch(input: RequestInfo | URL, init?: RequestInit): Pr
     url = `${BASE_URL}${input}`;
   }
 
-  const headers = new Headers(init?.headers);
+  const headers: Record<string, string> = {};
+
+  if (init?.headers) {
+    if (init.headers instanceof Headers) {
+      init.headers.forEach((value, key) => {
+        headers[key] = value;
+      });
+    } else if (Array.isArray(init.headers)) {
+      init.headers.forEach(([key, value]) => {
+        headers[key] = value;
+      });
+    } else {
+      Object.assign(headers, init.headers);
+    }
+  }
 
   // Attach Workspace ID for multi-tenant backend architecture
   if (typeof window !== 'undefined') {
     const workspaceId = localStorage.getItem('activeWorkspaceId');
     if (workspaceId) {
-      headers.set(WORKSPACE_HEADER, workspaceId);
+      headers[WORKSPACE_HEADER] = workspaceId;
     }
 
     const token = localStorage.getItem('token');
     if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
+      headers['Authorization'] = `Bearer ${token}`;
     }
   }
 
   // Ensure content type is JSON by default
-  if (!headers.has('Content-Type') && !(init?.body instanceof FormData)) {
-    headers.set('Content-Type', 'application/json');
+  if (!headers['Content-Type'] && !(init?.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
   }
 
   return fetch(url, {
